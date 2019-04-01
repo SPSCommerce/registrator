@@ -1,0 +1,34 @@
+workspace:
+  base: /go
+  path: src/github.com/gliderlabs/registrator
+pipeline:
+  build_registrator_binary:
+    image: golang:1.11
+    environment:
+    - VERSION=${DRONE_TAG}
+    commands:
+    - curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o /bin/dep
+    - chmod +x /bin/dep
+    - cd /go/src/github.com/gliderlabs/registrator && git
+      config --global http.https://gopkg.in.followRedirects true && dep ensure &&
+      go build -ldflags "-X main.Version=$(cat VERSION)" -o dist/registrator
+    when:
+      event:
+      - tag
+      branch:
+      - master
+  bdp_core_deploy:
+    image: spscommerce/plugin-bdp-core
+    environment:
+    - VERSION=${DRONE_TAG}  # the version of your bdp-core deploy. Must match docker container tags
+    - REGION=us-east-1 # the region you are deploying to
+    - BDP_FILE=.bdp # the absolute path in the repo to the .bdp file that is being deployed
+    - ACTION=deploy # the bdp-core action
+    - ENVIRONMENT=dev # the environment to deploy to
+    commands:
+    - python -u /build/plug.py
+    when:
+      event:
+      - tag
+      branch:
+      - master

@@ -1,0 +1,11 @@
+schema_version: v2.0
+
+service:
+  id: 05782280-2907-48a5-b875-33d1ea4e4c19
+
+deploy: 
+  - name: registrator_binary
+    deploy_type: static_assets
+    source_dir: dist/
+    index_file: registrator
+    asset_type: static_site
