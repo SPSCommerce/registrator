@@ -80,6 +80,11 @@ func serviceMetaData(config *dockerapi.Config, port string) (map[string]string, 
 				metadata[key] = kvp[1]
 			}
 		}
+		if (kvp[0] == "com.amazonaws.ecs.task-arn") && len(kvp) > 1 {
+			key := "taskId"
+			value := string.Split(kvp[1], "/")
+	        metadata[key] = value[len(value)-1]
+		}
 	}
 	return metadata, metadataFromPort
 }
